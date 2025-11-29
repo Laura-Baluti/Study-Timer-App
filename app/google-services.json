@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "258509441800",
+    "project_id": "studytimerapp-6f61d",
+    "storage_bucket": "studytimerapp-6f61d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258509441800:android:5a4595226a9edd2585babd",
+        "android_client_info": {
+          "package_name": "com.example.studytimerapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl2nAiVi_RzSY-mcTg5VadcbCVWqZQp78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
