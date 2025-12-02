@@ -13,38 +13,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.studytimerapp.ui.theme.CherryBomb
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CronometruLiberScreen(
     navController: NavController,
-    sessionName: String = "Matematica"
+    sessionName: String
 ) {
+    val context = LocalContext.current
 
-    var elapsedTime by remember { mutableIntStateOf(0) } // timp principal în secunde
-    var isPaused by remember { mutableStateOf(false) } // pauză activă sau nu
-    var pauseTime by remember { mutableIntStateOf(0) } // pauza curentă în secunde
-    var sessionEnded by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    val viewModel: TimerViewModel = viewModel(
+        factory = TimerViewModelFactory(
+            context = context,
+            sessionName = sessionName,
+            sessionType = "Cronometru Liber",
+            fixedMinutes = 0
+        )
+    )
 
-    // Countdown principal + pauză
-    LaunchedEffect(Unit) {
-        while (!sessionEnded) {
-            delay(1000)
-            if (!isPaused) {
-                elapsedTime += 1
-            } else {
-                if (pauseTime > 0) {
-                    pauseTime -= 1
-                }
-                if (pauseTime <= 0) isPaused = false
-            }
-        }
-    }
+    val displayTime by viewModel.displayTime.collectAsState()
+    val isPaused by viewModel.isPaused.collectAsState()
+    val breakTimeLeft by viewModel.breakTimeLeft.collectAsState()
+    val sessionFinished by viewModel.sessionFinished.collectAsState()
+
+    val minutes = displayTime / 60
+    val seconds = displayTime % 60
 
     val fullCozyGradient = Brush.verticalGradient(
         colors = listOf(
@@ -82,8 +79,8 @@ fun CronometruLiberScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            val minutes = elapsedTime / 60
-            val seconds = elapsedTime % 60
+            val minutes = displayTime / 60
+            val seconds = displayTime % 60
             Text(
                 text = String.format(Locale.US, "%02d:%02d", minutes, seconds),
                 fontFamily = CherryBomb,
@@ -92,34 +89,24 @@ fun CronometruLiberScreen(
                 color = Color(0xFFFFE4D6)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // Pauza
-            if (isPaused) {
-                val pauseMinutes = pauseTime / 60
-                val pauseSeconds = pauseTime % 60
+            // Afișează pauza dacă e activă
+            if (isPaused && breakTimeLeft > 0) {
+                val breakMin = breakTimeLeft / 60
+                val breakSec = breakTimeLeft % 60
                 Text(
-                    text = "Pauză: ${String.format(Locale.US, "%02d:%02d", pauseMinutes, pauseSeconds)}",
+                    text = "Pauză: ${String.format(Locale.US, "%02d:%02d", breakMin, breakSec)}",
                     fontFamily = CherryBomb,
-                    fontSize = 24.sp,
+                    fontSize = 28.sp,
                     color = Color(0xFFFFE4D6)
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
             }
-
-
-            // Butoanele de pauză
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            // Butoane pauză
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(
-                    onClick = {
-                        if (!isPaused) {
-                            isPaused = true
-                            pauseTime = 1 * 60
-                        }
-                    },
+                    onClick = { viewModel.startBreak(5) },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB07D62))
                 ) {
@@ -127,12 +114,7 @@ fun CronometruLiberScreen(
                 }
 
                 Button(
-                    onClick = {
-                        if (!isPaused) {
-                            isPaused = true
-                            pauseTime = 10 * 60
-                        }
-                    },
+                    onClick = { viewModel.startBreak(10) },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB07D62))
                 ) {
@@ -140,36 +122,45 @@ fun CronometruLiberScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // Buton de terminare sesiune
+            // Stop Session
             Button(
-                onClick = { sessionEnded = true },
+                onClick = { viewModel.stopSession() },
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70))
             ) {
-                Text("End Session", fontFamily = CherryBomb, color = Color.White)
+                Text("Stop Session", fontFamily = CherryBomb, color = Color.White, fontSize = 20.sp)
             }
         }
 
-        // Popup la final
-        if (sessionEnded) {
+        // AlertDialog la finalizare
+        if (sessionFinished) {
             AlertDialog(
-                onDismissRequest = {
-                    sessionEnded = false
-                    navController.navigate("home") { popUpTo("home") { inclusive = true } }
+                onDismissRequest = { },
+                title = {
+                    Text("Sesiune terminată!", fontFamily = CherryBomb, color = Color(0xFFFFE4D6))
                 },
-                title = { Text("Sesiune terminată!", fontFamily = CherryBomb, color = Color(0xFFFFE4D6)) },
-                text = { Text("Felicitări! Ai terminat sesiunea.", color = Color.White) },
+                text = {
+                    Text(
+                        "Felicitări! Ai învățat $minutes minute și ai salvat sesiunea.",
+                        color = Color.White,
+                        fontFamily = CherryBomb
+                    )
+                },
                 confirmButton = {
                     TextButton(onClick = {
-                        sessionEnded = false
-                        navController.navigate("home") { popUpTo("home") { inclusive = true } }
+                        viewModel.resetAndGoHome {
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = true }
+                            }
+                        }
                     }) {
                         Text("OK", fontFamily = CherryBomb, color = Color(0xFFFFE4D6))
                     }
                 },
-                containerColor = Color(0xFF774936)
+                containerColor = Color(0xFF774936),
+                shape = RoundedCornerShape(20.dp)
             )
         }
     }

@@ -25,12 +25,21 @@ import androidx.navigation.NavController
 import com.example.studytimerapp.R
 import com.example.studytimerapp.ui.theme.CherryBomb
 
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.example.studytimerapp.data.firebase.FirebaseAuthManager
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val authManager = remember { FirebaseAuthManager() }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(false) }
 
     val gradient = Brush.verticalGradient(
         colors = listOf(
@@ -129,11 +138,25 @@ fun LoginScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth()
                     )
 
+
                     Button(
                         onClick = {
-                            // TODO: autentificare (mai târziu cu Room/Firestore)
-                            navController.navigate("home") {
-                                popUpTo("login") { inclusive = true }
+                            loading = true
+                            errorMessage = null
+
+                            scope.launch {
+                                val result = authManager.login(email, password)
+                                loading = false
+
+                                result
+                                    .onSuccess {
+                                        navController.navigate("home") {
+                                            popUpTo("login") { inclusive = true }
+                                        }
+                                    }
+                                    .onFailure { e ->
+                                        errorMessage = e.message ?: "Login eșuat"
+                                    }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70)),
@@ -142,7 +165,20 @@ fun LoginScreen(navController: NavController) {
                             .fillMaxWidth()
                             .height(56.dp)
                     ) {
-                        Text("Login", fontFamily = CherryBomb, fontSize = 22.sp, color = Color.White)
+                        Text(
+                            if (loading) "Se conectează..." else "Login",
+                            fontFamily = CherryBomb,
+                            fontSize = 22.sp,
+                            color = Color.White
+                        )
+                    }
+
+                    errorMessage?.let { msg ->
+                        Text(
+                            text = msg,
+                            color = Color.Red,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
 
                     TextButton(

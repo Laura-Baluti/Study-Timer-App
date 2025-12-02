@@ -22,6 +22,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.studytimerapp.ui.theme.CherryBomb
 
+
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.example.studytimerapp.data.firebase.FirebaseAuthManager
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -29,6 +34,12 @@ fun RegisterScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val authManager = remember { FirebaseAuthManager() }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(false) }
+
 
     val gradient = Brush.verticalGradient(
         colors = listOf(
@@ -146,14 +157,33 @@ fun RegisterScreen(navController: NavController) {
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     )
-
+                    val authManager = remember { FirebaseAuthManager() }
+                    var errorMessage by remember { mutableStateOf<String?>(null) }
+                    var loading by remember { mutableStateOf(false) }
                     // BUTON REGISTER
                     Button(
                         onClick = {
-                            // TODO: validare + salvare în Room mai târziu
-                            navController.navigate("home") {
-                                popUpTo("register") { inclusive = true }
-                                popUpTo("login") { inclusive = true }
+                            if (password != confirmPassword) {
+                                errorMessage = "Parolele nu coincid"
+                                return@Button
+                            }
+                            loading = true
+                            errorMessage = null
+
+                            scope.launch {
+                                val result = authManager.register(email, password)
+                                loading = false
+
+                                result
+                                    .onSuccess {
+                                        navController.navigate("home") {
+                                            popUpTo("register") { inclusive = true }
+                                            popUpTo("login") { inclusive = true }
+                                        }
+                                    }
+                                    .onFailure { e ->
+                                        errorMessage = e.message ?: "Înregistrare eșuată"
+                                    }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70)),
@@ -162,7 +192,21 @@ fun RegisterScreen(navController: NavController) {
                             .fillMaxWidth()
                             .height(56.dp)
                     ) {
-                        Text("Create Account", fontFamily = CherryBomb, fontSize = 22.sp, color = Color.White)
+                        Text(
+                            if (loading) "Se creează contul..." else "Create Account",
+                            fontFamily = CherryBomb,
+                            fontSize = 22.sp,
+                            color = Color.White
+                        )
+                    }
+
+                    // Mesaj de eroare
+                    errorMessage?.let { msg ->
+                        Text(
+                            text = msg,
+                            color = Color.Red,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
 
                     // Link înapoi la Login

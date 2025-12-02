@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -47,7 +48,6 @@ android {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
 }
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -57,6 +57,24 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
+    // --------- FIREBASE + COROUTINES ----------
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation("com.google.firebase:firebase-auth")
+    // scoate COMPLET linia asta:
+    // implementation(libs.firebase.auth.ktx)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    // ------------------------------------------
+
+    implementation("androidx.navigation:navigation-compose:2.7.3")
+    implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("androidx.room:room-runtime:2.8.3")
+    implementation("androidx.room:room-ktx:2.8.3")
+    kapt("androidx.room:room-compiler:2.8.3")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -64,22 +82,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation("androidx.navigation:navigation-compose:2.7.3")
-    implementation("androidx.compose.material:material-icons-extended")
-    // Compose BOM (versiuni sincronizate)
-    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
-
-    // Jetpack Compose UI
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-
-    // Material 3 Design
-    implementation("androidx.compose.material3:material3")
-
-    // Necesare pentru Compose
-    implementation("androidx.activity:activity-compose:1.9.0")
-
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
 }
