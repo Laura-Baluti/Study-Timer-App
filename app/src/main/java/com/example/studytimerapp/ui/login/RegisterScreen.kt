@@ -27,6 +27,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.example.studytimerapp.data.firebase.FirebaseAuthManager
 
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
+
+import com.example.studytimerapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -41,23 +47,15 @@ fun RegisterScreen(navController: NavController) {
     var loading by remember { mutableStateOf(false) }
 
 
-    val gradient = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFF2A0800),
-            Color(0xFF774936),
-            Color(0xFF9D6B53),
-            Color(0xFFB07D62),
-            Color(0xFFC38E70),
-            Color(0xFFD69F7E),
-            Color(0xFFE6B8A2),
-            Color(0xFFEDC4B3),
-            Color(0xFFFFFFFF)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.homescreen), // sau aceeași imagine ca login_bg
+            contentDescription = "Register Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-    )
 
-    Box(modifier = Modifier.fillMaxSize().background(gradient)) {
-
-
+        Box(modifier = Modifier.fillMaxSize().background(Color(0x22000000)))
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,17 +64,18 @@ fun RegisterScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Join the Café!",
+                text = "Study With Me",
                 fontFamily = CherryBomb,
                 fontSize = 40.sp,
-                color = Color(0xFFFFE4D6),
+                color = Color(0xFFFAEBE3),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             Text(
-                text = "Începe să studiezi mai cozy",
-                fontSize = 18.sp,
-                color = Color(0xFFE6B8A2)
+                text = "Descopera invatatul intr-un mod relaxant ♡",
+                fontFamily = CherryBomb,
+                fontSize = 22.sp,
+                color = Color(0xFFFAEBE3)
             )
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -94,7 +93,7 @@ fun RegisterScreen(navController: NavController) {
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email", color = Color(0xFFFFE4D6)) },
+                        label = { Text("Email", color = Color(0xFF2A0800)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true,
                         textStyle = LocalTextStyle.current.copy(color = Color.White),
@@ -102,7 +101,7 @@ fun RegisterScreen(navController: NavController) {
                             focusedIndicatorColor = Color(0xFFFFE4D6),
                             unfocusedIndicatorColor = Color(0x99FFE4D6),
                             cursorColor = Color(0xFFFFE4D6),
-                            focusedLabelColor = Color(0xFFFFE4D6),
+                            focusedLabelColor = Color(0xFF2A0800),
                             unfocusedLabelColor = Color(0xCCFFE4D6)
                         ),
                         shape = RoundedCornerShape(16.dp),
@@ -113,7 +112,7 @@ fun RegisterScreen(navController: NavController) {
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Parolă", color = Color(0xFFFFE4D6)) },
+                        label = { Text("Parolă", color = Color(0xFF2A0800)) },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         trailingIcon = {
@@ -131,7 +130,7 @@ fun RegisterScreen(navController: NavController) {
                             focusedIndicatorColor = Color(0xFFFFE4D6),
                             unfocusedIndicatorColor = Color(0x99FFE4D6),
                             cursorColor = Color(0xFFFFE4D6),
-                            focusedLabelColor = Color(0xFFFFE4D6),
+                            focusedLabelColor = Color(0xFF2A0800),
                             unfocusedLabelColor = Color(0xCCFFE4D6)
                         ),
                         shape = RoundedCornerShape(16.dp),
@@ -142,7 +141,7 @@ fun RegisterScreen(navController: NavController) {
                     OutlinedTextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
-                        label = { Text("Confirmă parola", color = Color(0xFFFFE4D6)) },
+                        label = { Text("Confirmă parola", color = Color(0xFF2A0800)) },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
@@ -151,7 +150,7 @@ fun RegisterScreen(navController: NavController) {
                             focusedIndicatorColor = Color(0xFFFFE4D6),
                             unfocusedIndicatorColor = Color(0x99FFE4D6),
                             cursorColor = Color(0xFFFFE4D6),
-                            focusedLabelColor = Color(0xFFFFE4D6),
+                            focusedLabelColor = Color(0xFF2A0800),
                             unfocusedLabelColor = Color(0xCCFFE4D6)
                         ),
                         shape = RoundedCornerShape(16.dp),
@@ -186,7 +185,7 @@ fun RegisterScreen(navController: NavController) {
                                     }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6B4752)),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -216,7 +215,7 @@ fun RegisterScreen(navController: NavController) {
                     ) {
                         Text(
                             "Ai deja cont? Loghează-te",
-                            color = Color(0xFFFFE4D6),
+                            color = Color(0xFF2F5230),
                             fontSize = 16.sp
                         )
                     }

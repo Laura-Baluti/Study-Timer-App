@@ -26,6 +26,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.studytimerapp.ui.home.HomeViewModel
 import java.util.Date
 import androidx.compose.ui.platform.LocalContext
+
+
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import com.example.studytimerapp.R
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerFixScreen(
@@ -52,25 +59,21 @@ fun TimerFixScreen(
     val minutes = displayTime / 60
     val seconds = displayTime % 60
 
-    val fullCozyGradient = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFF2A0800),
-            Color(0xFF774936),
-            Color(0xFF8A5A44),
-            Color(0xFF9D6B53),
-            Color(0xFFB07D62),
-            Color(0xFFC38E70),
-            Color(0xFFD69F7E),
-            Color(0xFFE6B8A2),
-            Color(0xFFEDC4B3)
+    Box(modifier = Modifier.fillMaxSize()) {
+        // IMAGINE DE FUNDAL COMPLETĂ
+        Image(
+            painter = painterResource(id = R.drawable.timerlightt), // ← imaginea ta aici
+            contentDescription = "Timer Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-    )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(fullCozyGradient)
-    ) {
+        // Overlay ușor ca să se vadă textul clar
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x22000000)) // negru semi-transparent – ajustează dacă vrei
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -83,7 +86,7 @@ fun TimerFixScreen(
                 fontFamily = CherryBomb,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFFFE4D6)
+                color = Color(0xFFFFFFFF)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -95,7 +98,7 @@ fun TimerFixScreen(
                 fontFamily = CherryBomb,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFFFE4D6)
+                color = Color(0xFFFFFFFF)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -107,7 +110,7 @@ fun TimerFixScreen(
                     text = "Pauză: ${String.format(Locale.US, "%02d:%02d", breakMin, breakSec)}",
                     fontFamily = CherryBomb,
                     fontSize = 28.sp,
-                    color = Color(0xFFFFE4D6)
+                    color = Color(0xFFFFFFFF)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
             }
@@ -116,7 +119,7 @@ fun TimerFixScreen(
                 Button(
                     onClick = { viewModel.startBreak(5) },
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB07D62))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF466531))
                 ) {
                     Text("Pauză scurtă", fontFamily = CherryBomb, color = Color.White)
                 }
@@ -124,7 +127,7 @@ fun TimerFixScreen(
                 Button(
                     onClick = { viewModel.startBreak(10) },
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB07D62))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF466531))
                 ) {
                     Text("Pauză lungă", fontFamily = CherryBomb, color = Color.White)
                 }
@@ -135,7 +138,7 @@ fun TimerFixScreen(
             Button(
                 onClick = { viewModel.stopSession() },
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF466531))
             ) {
                 Text("Stop Session", fontFamily = CherryBomb, color = Color.White, fontSize = 20.sp)
             }
@@ -145,7 +148,7 @@ fun TimerFixScreen(
             AlertDialog(
                 onDismissRequest = { },
                 title = {
-                    Text("Sesiune terminată!", fontFamily = CherryBomb, color = Color(0xFFFFE4D6))
+                    Text("Sesiune terminată!", fontFamily = CherryBomb, color = Color(0xFFFFFFFF))
                 },
                 text = {
                     Text(
@@ -162,10 +165,10 @@ fun TimerFixScreen(
                             }
                         }
                     }) {
-                        Text("OK", fontFamily = CherryBomb, color = Color(0xFFFFE4D6))
+                        Text("OK", fontFamily = CherryBomb, color = Color(0xFFFFFFFF))
                     }
                 },
-                containerColor = Color(0xFF774936),
+                containerColor = Color(0xFF466531),
                 shape = RoundedCornerShape(20.dp)
             )
         }

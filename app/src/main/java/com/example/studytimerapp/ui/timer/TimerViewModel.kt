@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
-
+import com.example.studytimerapp.data.room.StudyRepository
 class TimerViewModel(
     context: Context,
     private val sessionName: String,
@@ -99,16 +99,18 @@ class TimerViewModel(
                 (initialFixedSeconds - _displayTime.value) / 60  // cât a lucrat efectiv
             } else {
                 _displayTime.value / 60
-            }
+            }.coerceAtLeast(0)
 
             val session = StudySessionEntity(
                 userId = userId,
                 name = sessionName,
                 type = sessionType,
-                durationMinutes = actualMinutes.coerceAtLeast(0),
+                durationMinutes = actualMinutes,
                 timestamp = Date().time
             )
             db.studySessionDao().insertSession(session)
+            val repository = StudyRepository(db.studySessionDao())
+            repository.updateMonthlyGoalProgress(userId)
         }
     }
 

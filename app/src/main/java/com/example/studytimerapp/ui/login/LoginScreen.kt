@@ -29,6 +29,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.example.studytimerapp.data.firebase.FirebaseAuthManager
 
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -41,26 +45,21 @@ fun LoginScreen(navController: NavController) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
 
-    val gradient = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFF2A0800),
-            Color(0xFF774936),
-            Color(0xFF9D6B53),
-            Color(0xFFB07D62),
-            Color(0xFFC38E70),
-            Color(0xFFD69F7E),
-            Color(0xFFE6B8A2),
-            Color(0xFFEDC4B3),
-            Color(0xFFFFFFFF)
+    Box(modifier = Modifier.fillMaxSize()) {
+        // IMAGINE DE FUNDAL
+        Image(
+            painter = painterResource(id = R.drawable.homescreen),
+            contentDescription = "Login Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-    )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradient)
-    ) {
-
+        // Overlay întunecat (ca să se vadă textul)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x22000000)) // negru 53% opac
+        )
 
         Column(
             modifier = Modifier
@@ -73,21 +72,22 @@ fun LoginScreen(navController: NavController) {
                 text = "Welcome Back!",
                 fontFamily = CherryBomb,
                 fontSize = 42.sp,
-                color = Color(0xFFFFE4D6),
+                color = Color(0xFFFAEBE3),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             Text(
-                text = "Hai să studiem împreună ☕",
-                fontSize = 18.sp,
-                color = Color(0xFFE6B8A2)
+                text = "Hai să studiem împreună ♡",
+                fontFamily = CherryBomb,
+                fontSize = 22.sp,
+                color = Color(0xFFFAEBE3)
             )
 
             Spacer(modifier = Modifier.height(48.dp))
 
             Card(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0x44FFFFFF)),
+                colors = CardDefaults.cardColors(containerColor = Color(0x45FFFFFF)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -97,14 +97,13 @@ fun LoginScreen(navController: NavController) {
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email", color = Color(0xFFFFE4D6)) },
+                        label = { Text("Email", color = Color(0xFF041E04)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         colors = TextFieldDefaults.colors(
-                            // Parametri de bază – funcționează peste tot!
-                            focusedIndicatorColor = Color(0xFFFFE4D6),
+                            focusedIndicatorColor = Color(0xFF52303C),
                             unfocusedIndicatorColor = Color(0x99FFE4D6),
                             cursorColor = Color(0xFFFFE4D6),
-                            focusedLabelColor = Color(0xFFFFE4D6),
+                            focusedLabelColor = Color(0xFF52303C),
                             unfocusedLabelColor = Color(0xCCFFE4D6)
                         ),
                         shape = RoundedCornerShape(16.dp),
@@ -114,7 +113,7 @@ fun LoginScreen(navController: NavController) {
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Parolă", color = Color(0xFFFFE4D6)) },
+                        label = { Text("Parolă", color = Color(0xFF041E04)) },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         trailingIcon = {
@@ -122,12 +121,11 @@ fun LoginScreen(navController: NavController) {
                                 Icon(
                                     imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                     contentDescription = "Toggle password visibility",
-                                    tint = Color(0xFFFFE4D6)
+                                    tint = Color(0xFFFFFFFF)
                                 )
                             }
                         },
                         colors = TextFieldDefaults.colors(
-                            // Aceiași parametri simpli
                             focusedIndicatorColor = Color(0xFFFFE4D6),
                             unfocusedIndicatorColor = Color(0x99FFE4D6),
                             cursorColor = Color(0xFFFFE4D6),
@@ -159,7 +157,7 @@ fun LoginScreen(navController: NavController) {
                                     }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA9C488)),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -187,7 +185,7 @@ fun LoginScreen(navController: NavController) {
                     ) {
                         Text(
                             "Nu ai cont? Înregistrează-te aici ♡",
-                            color = Color(0xFFFFE4D6),
+                            color = Color(0xFF502633),
                             fontSize = 16.sp
                         )
                     }

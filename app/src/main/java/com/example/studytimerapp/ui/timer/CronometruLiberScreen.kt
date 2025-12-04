@@ -18,6 +18,13 @@ import com.example.studytimerapp.ui.theme.CherryBomb
 import java.util.Locale
 import androidx.compose.ui.platform.LocalContext
 
+
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import com.example.studytimerapp.R
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CronometruLiberScreen(
@@ -43,25 +50,24 @@ fun CronometruLiberScreen(
     val minutes = displayTime / 60
     val seconds = displayTime % 60
 
-    val fullCozyGradient = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFF2A0800),
-            Color(0xFF774936),
-            Color(0xFF8A5A44),
-            Color(0xFF9D6B53),
-            Color(0xFFB07D62),
-            Color(0xFFC38E70),
-            Color(0xFFD69F7E),
-            Color(0xFFE6B8A2),
-            Color(0xFFEDC4B3)
+    Box(modifier = Modifier.fillMaxSize()) {
+        //  IMAGINE DE FUNDAL COMPLET
+        Image(
+            painter = painterResource(id = R.drawable.cronlight), // pune-ți imaginea aici
+            contentDescription = "Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-    )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(fullCozyGradient)
-    ) {
+        // Overlay ușor ca să se vadă textul (poți șterge dacă imaginea e întunecată)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x11000000)) // negru semi-transparent – ajustează dacă vrei
+        )
+
+
+        // TOT CODUL TĂU RĂMÂNE EXACT AȘA CUM ERA
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -108,7 +114,7 @@ fun CronometruLiberScreen(
                 Button(
                     onClick = { viewModel.startBreak(5) },
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB07D62))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE5427E))
                 ) {
                     Text("Pauză scurtă", fontFamily = CherryBomb, color = Color.White)
                 }
@@ -116,7 +122,7 @@ fun CronometruLiberScreen(
                 Button(
                     onClick = { viewModel.startBreak(10) },
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB07D62))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE5427E))
                 ) {
                     Text("Pauză lungă", fontFamily = CherryBomb, color = Color.White)
                 }
@@ -128,7 +134,7 @@ fun CronometruLiberScreen(
             Button(
                 onClick = { viewModel.stopSession() },
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC38E70))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB64E74))
             ) {
                 Text("Stop Session", fontFamily = CherryBomb, color = Color.White, fontSize = 20.sp)
             }
@@ -159,7 +165,7 @@ fun CronometruLiberScreen(
                         Text("OK", fontFamily = CherryBomb, color = Color(0xFFFFE4D6))
                     }
                 },
-                containerColor = Color(0xFF774936),
+                containerColor = Color(0xFF7A253E),
                 shape = RoundedCornerShape(20.dp)
             )
         }
