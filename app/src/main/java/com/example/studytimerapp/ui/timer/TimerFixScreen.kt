@@ -33,6 +33,12 @@ import androidx.compose.foundation.Image
 import com.example.studytimerapp.R
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.content.Context
+import kotlin.math.sqrt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerFixScreen(
@@ -51,6 +57,73 @@ fun TimerFixScreen(
         )
     )
 
+
+    val sensorManager = remember { context.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
+    val lightSensor = remember { sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) }
+
+    var isDark by remember { mutableStateOf(false) }
+    DisposableEffect(Unit) {
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                val lux = event.values[0]
+                isDark = lux < 10f // sub 30 lux = întuneric (poți ajusta valoarea)
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+
+        lightSensor?.let {
+            sensorManager.registerListener(listener, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+
+        onDispose {
+            sensorManager.unregisterListener(listener)
+        }
+    }
+
+    // === 2. SHAKE TO PAUSE ===
+    var shakeDetected by remember { mutableStateOf(false) }
+    var lastShakeTime by remember { mutableStateOf(0L) }
+    val accelerometer = remember { sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
+
+    DisposableEffect(Unit) {
+        val shakeListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+                    val x = event.values[0]
+                    val y = event.values[1]
+                    val z = event.values[2]
+
+                    val gForce = sqrt(x*x + y*y + z*z.toDouble()) / SensorManager.GRAVITY_EARTH
+                    val now = System.currentTimeMillis()
+
+                    if (gForce > 2.7 && now - lastShakeTime > 2000) { // shake puternic + anti-spam 2 sec
+                        lastShakeTime = now
+                        viewModel.startBreak(5)
+                        shakeDetected = true
+                    }
+                }
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+
+        accelerometer?.let {
+            sensorManager.registerListener(shakeListener, it, SensorManager.SENSOR_DELAY_GAME)
+        }
+
+        onDispose { sensorManager.unregisterListener(shakeListener) }
+    }
+
+    // Ascundem mesajul de shake după 1.5 sec
+    if (shakeDetected) {
+        LaunchedEffect(Unit) {
+            delay(1500)
+            shakeDetected = false
+        }
+    }
+
+
+
+
     val displayTime by viewModel.displayTime.collectAsState()
     val isPaused by viewModel.isPaused.collectAsState()
     val breakTimeLeft by viewModel.breakTimeLeft.collectAsState()
@@ -58,21 +131,22 @@ fun TimerFixScreen(
 
     val minutes = displayTime / 60
     val seconds = displayTime % 60
-
+    val buttonColor = if (isDark) Color(0xFF1A3A1B) else Color(0xFF466531)
+    val stopButtonColor = if (isDark) Color(0xFF1A3A1B) else Color(0xFF466531)
     Box(modifier = Modifier.fillMaxSize()) {
-        // IMAGINE DE FUNDAL COMPLETĂ
+        // IMAGINE DINAMICĂ ÎN FUNCȚIE DE LUMINĂ
         Image(
-            painter = painterResource(id = R.drawable.timerlightt), // ← imaginea ta aici
+            painter = painterResource(id = if (isDark) R.drawable.timerdark else R.drawable.timerlightt),
             contentDescription = "Timer Background",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
-        // Overlay ușor ca să se vadă textul clar
+        // Overlay ușor ca să se vadă textul
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0x22000000)) // negru semi-transparent – ajustează dacă vrei
+                .background(Color(if (isDark) 0x88000000 else 0x66000000))
         )
         Column(
             modifier = Modifier
@@ -119,7 +193,7 @@ fun TimerFixScreen(
                 Button(
                     onClick = { viewModel.startBreak(5) },
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF466531))
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     Text("Pauză scurtă", fontFamily = CherryBomb, color = Color.White)
                 }
@@ -127,7 +201,7 @@ fun TimerFixScreen(
                 Button(
                     onClick = { viewModel.startBreak(10) },
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF466531))
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     Text("Pauză lungă", fontFamily = CherryBomb, color = Color.White)
                 }
@@ -138,9 +212,18 @@ fun TimerFixScreen(
             Button(
                 onClick = { viewModel.stopSession() },
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF466531))
+                colors = ButtonDefaults.buttonColors(containerColor = stopButtonColor)
             ) {
                 Text("Stop Session", fontFamily = CherryBomb, color = Color.White, fontSize = 20.sp)
+            }
+        }
+
+        // Feedback vizual la shake
+        if (shakeDetected) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Card(modifier = Modifier.padding(top = 100.dp), colors = CardDefaults.cardColors(containerColor = Color(0xDDE5427E))) {
+                    Text("Pauză activată prin shake!", fontFamily = CherryBomb, fontSize = 18.sp, color = Color.White, modifier = Modifier.padding(16.dp))
+                }
             }
         }
 
